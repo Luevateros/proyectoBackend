@@ -1,0 +1,3 @@
+[submodule "config-data"]
+	path = config-data
+	url = https://luevateros@bitbucket.org/luevateros/config-data.git
