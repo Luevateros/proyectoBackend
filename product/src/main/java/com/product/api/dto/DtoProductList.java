@@ -22,25 +22,25 @@ public class DtoProductList {
 	@Column(name = "product_id")
 	@JsonProperty("product_id")
 	private Integer product_id;
-	
+
 	@NotNull
 	@Column(name = "gtin")
 	@JsonProperty("gtin")
 	private String gtin;
-	
+
 	@NotNull
 	@Column(name = "product")
 	@JsonProperty("product")
 	private String product;
-	
+
 	@NotNull
 	@Column(name = "price")
 	@JsonProperty("price")
 	private float price;
-	
+
 	@Column(name = "status")
-	@Min(value = 0, message="status must be 0 or 1")
-	@Max(value = 1, message="status must be 0 or 1")
+	@Min(value = 0, message = "status must be 0 or 1")
+	@Max(value = 1, message = "status must be 0 or 1")
 	@JsonIgnore
 	private Integer status;
 
@@ -83,5 +83,5 @@ public class DtoProductList {
 	public void setStatus(Integer status) {
 		this.status = status;
 	}
-	
+
 }

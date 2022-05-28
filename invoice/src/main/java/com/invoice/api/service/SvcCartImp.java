@@ -21,37 +21,47 @@ public class SvcCartImp implements SvcCart {
 
 	@Autowired
 	RepoCart repo;
-	
+
 	@Autowired
 	CustomerClient customerCl;
-	
+
 	@Autowired
 	ProductClient productCl;
-	
+
 	@Override
 	public List<Cart> getCart(String rfc) {
-		return repo.findByRfcAndStatus(rfc,1);
+		return repo.findByRfcAndStatus(rfc, 1);
 	}
 
 	@Override
 	public ApiResponse addToCart(Cart cart) {
-		if(!validateCustomer(cart.getRfc()))
+		if (!validateCustomer(cart.getRfc()))
 			throw new ApiException(HttpStatus.BAD_REQUEST, "customer does not exist");
-		if(!validateProduct(cart.getGtin()))
-			throw new ApiException(HttpStatus.BAD_REQUEST, "product does not exist");	
+		if (!validateProduct(cart.getGtin()))
+			throw new ApiException(HttpStatus.BAD_REQUEST, "product does not exist");
 
 		ResponseEntity<DtoProduct> response = productCl.getProduct(cart.getGtin());
-		Integer product_stock = response.getBody().getStock(); 
-		
-		if(cart.getQuantity() > product_stock) {
+		Integer product_stock = response.getBody().getStock();
+
+		if (cart.getQuantity() > product_stock) {
 			throw new ApiException(HttpStatus.BAD_REQUEST, "invalid quantity");
 		}
-		
-		/*
-		 * Sprint 2 - Requerimiento 3
-		 * Validar si el producto ya había sido agregado al carrito para solo actualizar su cantidad
-		 */
-		
+
+		// Revisamos si ya existia el producto en el carrito
+		List<Cart> carrito = getCart(cart.getRfc());
+		if (carrito != null) {
+			for (Cart cart2 : carrito) {
+				if (cart2.getGtin().equals(cart.getGtin())) {
+					cart2.setQuantity(cart2.getQuantity() + cart.getQuantity());
+					if (cart2.getQuantity() > product_stock) {
+						throw new ApiException(HttpStatus.BAD_REQUEST, "invalid quantity");
+					}
+					repo.save(cart2);
+					return new ApiResponse("quantity updated");
+				}
+			}
+		}
+
 		cart.setStatus(1);
 		repo.save(cart);
 		return new ApiResponse("item added");
@@ -72,27 +82,27 @@ public class SvcCartImp implements SvcCart {
 		else
 			throw new ApiException(HttpStatus.BAD_REQUEST, "cart cannot be removed");
 	}
-	
+
 	private boolean validateCustomer(String rfc) {
 		try {
 			ResponseEntity<DtoCustomer> response = customerCl.getCustomer(rfc);
-			if(response.getStatusCode() == HttpStatus.OK)
+			if (response.getStatusCode() == HttpStatus.OK)
 				return true;
 			else
 				return false;
-		}catch(Exception e) {
+		} catch (Exception e) {
 			throw new ApiException(HttpStatus.BAD_REQUEST, "unable to retrieve customer information");
 		}
 	}
-	
+
 	private boolean validateProduct(String gtin) {
 		try {
 			ResponseEntity<DtoProduct> response = productCl.getProduct(gtin);
-			if(response.getStatusCode() == HttpStatus.OK)
+			if (response.getStatusCode() == HttpStatus.OK)
 				return true;
 			else
 				return false;
-		}catch(Exception e) {
+		} catch (Exception e) {
 			throw new ApiException(HttpStatus.BAD_REQUEST, "unable to retrieve product information");
 		}
 	}
