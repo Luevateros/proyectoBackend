@@ -93,4 +93,13 @@ public class SvcProductImp implements SvcProduct {
 		}
 	}
 
+	@Override
+	public ApiResponse updateProductStock(List<Product> in) {
+		for (Product product : in) {
+			getProduct(product.getGtin());// Si no existe el producto mandamos API Excpetion
+			repo.updateProductStock(product.getProduct_id(), product.getStock());
+		}
+		return new ApiResponse("products stock updated");
+	}
+
 }

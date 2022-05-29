@@ -3,6 +3,7 @@ package com.product.api.controller;
 import java.util.List;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -56,12 +57,13 @@ public class CtrlProduct {
 		return new ResponseEntity<ApiResponse>(svc.updateProduct(in, id), HttpStatus.OK);
 	}
 
-	@PutMapping("/{id}")
-	public ResponseEntity<ApiResponse> updateProducts(@PathVariable("id") Integer id, @Valid @RequestBody Product in,
+	@PutMapping("/{stock}")
+	public ResponseEntity<ApiResponse> updateProductStock(
+			@NotEmpty(message = "Input list cannot be empty") @RequestBody List<@Valid Product> in,
 			BindingResult bindingResult) {
 		if (bindingResult.hasErrors())
 			throw new ApiException(HttpStatus.BAD_REQUEST, bindingResult.getAllErrors().get(0).getDefaultMessage());
-		return new ResponseEntity<ApiResponse>(svc.updateProduct(in, id), HttpStatus.OK);
+		return new ResponseEntity<ApiResponse>(svc.updateProductStock(in), HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{id}")

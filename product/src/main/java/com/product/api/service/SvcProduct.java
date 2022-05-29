@@ -10,10 +10,17 @@ import com.product.api.entity.Product;
 public interface SvcProduct {
 
 	List<DtoProductList> getProducts(Integer category_id);
+
 	Product getProduct(String gtin);
+
 	ApiResponse updateProductCategory(Category category, Integer id);
+
 	ApiResponse createProduct(Product in);
+
 	ApiResponse updateProduct(Product in, Integer id);
+
 	ApiResponse deleteProduct(Integer id);
-	
+
+	ApiResponse updateProductStock(List<Product> in);
+
 }
