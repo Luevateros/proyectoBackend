@@ -96,7 +96,9 @@ public class SvcProductImp implements SvcProduct {
 	@Override
 	public ApiResponse updateProductStock(List<Product> in) {
 		for (Product product : in) {
-			getProduct(product.getGtin());// Si no existe el producto mandamos API Excpetion
+			Product p = getProduct(product.getGtin());// Si no existe el producto mandamos API Excpetion
+			if (p.getStock() - product.getStock() < 0)
+				throw new ApiException(HttpStatus.BAD_REQUEST, "product stock not valid");
 			repo.updateProductStock(product.getProduct_id(), product.getStock());
 		}
 		return new ApiResponse("products stock updated");
