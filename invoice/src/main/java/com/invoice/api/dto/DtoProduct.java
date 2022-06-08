@@ -3,6 +3,7 @@ package com.invoice.api.dto;
 public class DtoProduct {
 	private String gtin;
 	private Integer stock;
+	private Double price;
 
 	public String getGtin() {
 		return gtin;
@@ -19,6 +20,13 @@ public class DtoProduct {
 	public void setStock(Integer stock) {
 		this.stock = stock;
 	}
-	
+
+	public Double getPrice() {
+		return price;
+	}
+
+	public void setPrice(Double price) {
+		this.price = price;
+	}
 	
 }

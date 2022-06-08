@@ -57,7 +57,7 @@ public class CtrlProduct {
 		return new ResponseEntity<ApiResponse>(svc.updateProduct(in, id), HttpStatus.OK);
 	}
 
-	@PutMapping("/{stock}")
+	@PutMapping("/update-stock")
 	public ResponseEntity<ApiResponse> updateProductStock(
 			@NotEmpty(message = "Input list cannot be empty") @RequestBody List<@Valid Product> in,
 			BindingResult bindingResult) {

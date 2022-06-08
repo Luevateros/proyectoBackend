@@ -65,7 +65,12 @@ public class SvcProductImp implements SvcProduct {
 	public ApiResponse updateProduct(Product in, Integer id) {
 		getProduct(in.getGtin());// Si no existe el producto mandamos API Excpetion
 		try {
-			repo.updateProduct(id, in.getGtin(), in.getProduct(), in.getDescription(), in.getPrice(), in.getStock());
+			repo.updateProduct(	id, 
+								in.getGtin(), 
+								in.getProduct(), 
+								in.getDescription(), 
+								in.getPrice(), 
+								in.getStock());
 		} catch (DataIntegrityViolationException e) {
 			if (e.getLocalizedMessage().contains("gtin"))
 				throw new ApiException(HttpStatus.BAD_REQUEST, "product gtin already exists");

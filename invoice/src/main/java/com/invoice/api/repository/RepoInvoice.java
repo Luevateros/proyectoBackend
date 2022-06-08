@@ -10,6 +10,7 @@ import com.invoice.api.entity.Invoice;
 @Repository
 public interface RepoInvoice extends JpaRepository<Invoice, Integer>{
 
+	Invoice findByRfcAndTotal(String rfc, Double total);
 	List<Invoice> findByRfcAndStatus(String rfc, Integer status);
 
 }

@@ -35,6 +35,7 @@ public class SvcCartImp implements SvcCart {
 
 	@Override
 	public ApiResponse addToCart(Cart cart) {
+		
 		if (!validateCustomer(cart.getRfc()))
 			throw new ApiException(HttpStatus.BAD_REQUEST, "customer does not exist");
 		if (!validateProduct(cart.getGtin()))
