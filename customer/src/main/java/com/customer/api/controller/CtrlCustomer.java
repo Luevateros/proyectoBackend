@@ -27,41 +27,42 @@ import com.customer.exception.ApiException;
 @RestController
 @RequestMapping("/customer")
 public class CtrlCustomer {
-	
+
 	@Autowired
 	SvcCustomer svc;
-	
+
 	@GetMapping
-	public ResponseEntity<List<DtoCustomerList>> getCustomers(){		
+	public ResponseEntity<List<DtoCustomerList>> getCustomers() {
 		return new ResponseEntity<List<DtoCustomerList>>(svc.getCustomers(), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/{rfc}")
-	public ResponseEntity<Customer> getCustomer(@PathVariable("rfc") String rfc){
-		 return new ResponseEntity<Customer>(svc.getCustomer(rfc), HttpStatus.OK);
+	public ResponseEntity<Customer> getCustomer(@PathVariable("rfc") String rfc) {
+		return new ResponseEntity<Customer>(svc.getCustomer(rfc), HttpStatus.OK);
 	}
-	
+
 	@PostMapping
-	public ResponseEntity<ApiResponse> createCustomer(@Valid @RequestBody Customer in, BindingResult bindingResult){
-		if(bindingResult.hasErrors())
+	public ResponseEntity<ApiResponse> createCustomer(@Valid @RequestBody Customer in, BindingResult bindingResult) {
+		if (bindingResult.hasErrors())
 			throw new ApiException(HttpStatus.BAD_REQUEST, bindingResult.getAllErrors().get(0).getDefaultMessage());
 		return new ResponseEntity<ApiResponse>(svc.createCustomer(in), HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/{id}")
-	public ResponseEntity<ApiResponse> updateCustomer(@PathVariable("id") Integer id, @Valid @RequestBody Customer in, BindingResult bindingResult){
-		if(bindingResult.hasErrors())
+	public ResponseEntity<ApiResponse> updateCustomer(@PathVariable("id") Integer id, @Valid @RequestBody Customer in,
+			BindingResult bindingResult) {
+		if (bindingResult.hasErrors())
 			throw new ApiException(HttpStatus.BAD_REQUEST, bindingResult.getAllErrors().get(0).getDefaultMessage());
 		return new ResponseEntity<ApiResponse>(svc.updateCustomer(in, id), HttpStatus.OK);
 	}
-	
+
 	@DeleteMapping("/{id}")
-	public ResponseEntity<ApiResponse> deleteCustomer(@PathVariable("id") Integer id){
+	public ResponseEntity<ApiResponse> deleteCustomer(@PathVariable("id") Integer id) {
 		return new ResponseEntity<ApiResponse>(svc.deleteCustomer(id), HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/{id}/region")
-	public ResponseEntity<ApiResponse> updateCustomerRegion(@PathVariable("id") Integer id, @RequestBody Region in){
+	public ResponseEntity<ApiResponse> updateCustomerRegion(@PathVariable("id") Integer id, @RequestBody Region in) {
 		return new ResponseEntity<ApiResponse>(svc.updateCustomerRegion(in, id), HttpStatus.OK);
 	}
 }

@@ -26,19 +26,19 @@ public class SvcInvoiceImp implements SvcInvoice {
 
 	@Autowired
 	RepoInvoice repo;
-	
+
 	@Autowired
 	RepoItem repoItem;
 
 	@Autowired
 	SvcCart svcCart;
-	
+
 	@Autowired
 	CustomerClient customerCl;
-	
+
 	@Autowired
 	ProductClient productCl;
-	
+
 	@Override
 	public List<Invoice> getInvoices(String rfc) {
 		return repo.findByRfcAndStatus(rfc, 1);
@@ -51,14 +51,14 @@ public class SvcInvoiceImp implements SvcInvoice {
 
 	@Override
 	public ApiResponse generateInvoice(String rfc) {
-		
+
 		if (!validateCustomer(rfc))
 			throw new ApiException(HttpStatus.BAD_REQUEST, "customer does not exist");
-		
+
 		List<Cart> carrito = svcCart.getCart(rfc);
 		if (carrito == null)
 			throw new ApiException(HttpStatus.NOT_FOUND, "cart has no items");
-		
+
 		// Invoice con atributos vacíos, lo necesitamos crear antes para obtener su id.
 		Invoice invoice = new Invoice();
 		invoice.setRfc(rfc);
@@ -67,26 +67,27 @@ public class SvcInvoiceImp implements SvcInvoice {
 		invoice.setTotal(0.0);
 		invoice.setCreated_at(LocalDateTime.now());
 		invoice.setStatus(1);
+		// Guardamos en la base de datos
 		repo.save(invoice);
-		
+
 		// Este invoice ya tiene id
 		invoice = repo.findByRfcAndTotal(rfc, 0.0);
-		
+
 		double totalIn = 0.0;
 		double taxesIn = 0.0;
 		List<DtoProduct> dtos = new ArrayList<DtoProduct>();
-		
+
 		for (Cart cart : carrito) {
-			
+
 			String gtin = cart.getGtin();
 			ResponseEntity<DtoProduct> response = productCl.getProduct(gtin);
-			
+
 			int quantity = cart.getQuantity();
 			double price = response.getBody().getPrice();
 			double total = quantity * price;
 			double taxes = total * 0.16;
-			
-			Item nuevo   = new Item();
+
+			Item nuevo = new Item();
 			nuevo.setId_invoice(invoice.getInvoice_id());
 			nuevo.setGtin(gtin);
 			nuevo.setQuantity(quantity);
@@ -95,31 +96,33 @@ public class SvcInvoiceImp implements SvcInvoice {
 			nuevo.setSubtotal(total - taxes);
 			nuevo.setTotal(total);
 			nuevo.setStatus(1);
-			
+
 			repoItem.save(nuevo);
 			totalIn += total;
 			taxesIn += taxes;
-			
+
 			DtoProduct dto = new DtoProduct();
 			dto.setGtin(gtin);
 			dto.setStock(quantity);
 			dto.setPrice(price);
 			dtos.add(dto);
 		}
-		
+
 		invoice.setTotal(totalIn);
 		invoice.setTaxes(taxesIn);
 		invoice.setSubtotal(totalIn - taxesIn);
 		invoice.setCreated_at(LocalDateTime.now());
 		repo.save(invoice);
-		
+
+		// Actualizamos el stock
 		productCl.updateProductStock(dtos);
-		
-		// Falta vaciar el carrito
-		
+
+		// Vaciamos el carrito
+		svcCart.clearCart(rfc);
+
 		return new ApiResponse("invoice generated");
 	}
-	
+
 	private boolean validateCustomer(String rfc) {
 		try {
 			ResponseEntity<DtoCustomer> response = customerCl.getCustomer(rfc);
